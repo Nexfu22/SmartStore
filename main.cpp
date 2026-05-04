@@ -1,125 +1,95 @@
-#include "Book.h"
-#include "ElectronicDevice.h"
-#include "OfficeSupply.h"
-#include "exceptions.h"
-#include "templates.h"
-#include "FileIO.h"
+#include <iostream>
+#include "Product.h"
+#include "Customer.h"
+#include "Payment.h"
+#include "Delivery.h"
+#include "Order.h"
+#include "Store.h"
+
+using namespace std;
 
 int main() {
-    // Create 4 products
-    Product* products[4] = { nullptr, nullptr, nullptr, nullptr };
+    Store myStore("Smart Tech Store");
+
+    // 1. Create at least 4 products 
+    Product p1(1, "Laptop", 1200.0, 10);
+    Product p2(2, "Mouse", 25.0, 50);
+    Product p3(3, "Keyboard", 45.0, 30);
+    Product p4(4, "Monitor", 300.0, 5);
+    
+    myStore.addProduct(&p1);
+    myStore.addProduct(&p2);
+    myStore.addProduct(&p3);
+    myStore.addProduct(&p4);
+
+    // 2. Create at least one RegularCustomer and one PremiumCustomer
+    RegularCustomer c1(101, "Alice Smith", "555-1234");
+    PremiumCustomer c2(102, "Bob Johnson", "555-5678", 0.10); // 10% discount
+    
+    myStore.addCustomer(&c1);
+    myStore.addCustomer(&c2);
+
     try {
-        products[0] = new Book(101, "Clean Code", 250.0, 10, "Robert Martin", 431);
-    }
+        // --- Order 1: Delivered Order, Card Payment ---
+        Order order1(1001, "2026-05-04", &c2);
+        
+        // Add multiple products
+        order1.addItem(&p1, 1); 
+        order1.addItem(&p2, 2); 
+        
+        // Setup Delivery (Delivered Order)
+        Delivery delivery1(1, "123 Main St", 15.0, "Driver Dan");
+        order1.setDelivery(&delivery1);
+        
+        // Setup Payment (Card Payment) - Final total gets passed to payment
+        CardPayment cardPay(1, order1.calculateFinalTotal(), "1234567812345678");
+        cardPay.pay();
+        order1.setPayment(&cardPay);
+        
+        myStore.addOrder(&order1);
+        order1.printInvoice(); // Print invoice correctly
 
-    catch (InvalidPriceException& e) {
-        cout << e.what() << endl;
-    }
-    catch (InvalidQuantityException& e) {
-        cout << e.what() << endl;
-    }
-    try {
-        products[1] = new ElectronicDevice(102, "Samsung Galaxy", 15000.0, 5, "Samsung", 24);
-    }
+        // --- Order 2: Pickup Order, Cash Payment ---
+        Order order2(1002, "2026-05-04", &c1);
+        
+        // Add multiple products
+        order2.addItem(&p3, 1);
+        order2.addItem(&p4, 2);
+        
+        // Pickup order (No delivery fee, leave delivery as nullptr)
+        
+        // Setup Payment (Cash Payment)
+        CashPayment cashPay(2, order2.calculateFinalTotal());
+        cashPay.pay();
+        order2.setPayment(&cashPay);
+        
+        myStore.addOrder(&order2);
+        order2.printInvoice(); // Print invoice correctly
 
-    catch (InvalidPriceException& e) {
-        cout << e.what() << endl;
-    }
-    catch (InvalidQuantityException& e) {
-        cout << e.what() << endl;
-    }
-    try {
-        products[2] = new OfficeSupply(103, "Stapler", 75.0, 30, "Fasteners", "Metal");
-    }
+        myStore.displayStoreSummary();
 
-    catch (InvalidPriceException& e) {
-        cout << e.what() << endl;
-    }
-    catch (InvalidQuantityException& e) {
-        cout << e.what() << endl;
-    }
-    try {
-        products[3] = new Book(104, "Harry Potter", -180.0, 8, "J.K. Rowling", 500);
-    }
-
-    catch (InvalidPriceException& e) {
-        cout << e.what() << endl;
-    }
-    catch (InvalidQuantityException& e) {
-        cout << e.what() << endl;
-    }
-
-    // Display all products
-    cout << "\n===== All Products =====" << endl;
-    for (int i = 0; i < 4; i++) {
-        if (products[i] != nullptr) {
-            products[i]->displayInfo();
+        cout << "\n--- Exception Handling Demonstration ---\n";
+        
+        // Exception Case 1: Invalid Card Number
+        try {
+            cout << "Attempting to process invalid card...\n";
+            CardPayment badCard(3, 100.0, "1234"); // Only 4 digits
+            badCard.pay(); 
+        } catch (const exception& e) {
+            cout << "Caught Exception: " << e.what() << endl;
         }
-        else {
-            cout << "Product " << i + 1 << " was skipped due to invalid data." << endl;
+
+        // Exception Case 2: Insufficient Stock
+        try {
+            cout << "\nAttempting to buy more monitors than available...\n";
+            Order order3(1003, "2026-05-04", &c1);
+            order3.addItem(&p4, 10); // Only 3 left after order2 took 2
+        } catch (const exception& e) {
+            cout << "Caught Exception: " << e.what() << endl;
         }
-    }
 
-    // Static function
-    Product::printTotalProducts();
-
-    // Purchase operations
-    cout << "\n===== Purchase Operations =====" << endl;
-
-    try {
-        if (products[0] != nullptr)
-            products[0]->buyOne();
-        else
-            cout << "Product 1 is not available." << endl;
-
-        if (products[1] != nullptr)
-            products[1]->buyMultiple(3);
-        else
-            cout << "Product 2 is not available." << endl;
-
-        if (products[2] != nullptr)
-            products[2]->buyMultiple(100);
-        else
-            cout << "Product 3 is not available." << endl;
-
-    }
-    catch (OutOfStockException& e) {
-        cout << e.what() << endl;
-    }
-
-
-
-    // File I/O
-    cout << "\n===== File Operations =====" << endl;
-    try {
-        saveAllProducts(products, 4);
-        readProductsFromFile();
-    }
-
-    catch (FileException& e) {
-        cout << e.what() << endl;
-    }
-
-    moreExpensive(products[0], products[1]);
-
-
-    Product* highest = findHighestPrice(products, 4);
-    cout << "\nHighest price product: " << highest->getName() << endl;
-
-    cout << "Before swap: " << products[0]->getName() << " and " << products[1]->getName() << endl;
-    swapProducts(products[0], products[1]);
-    cout << "After swap: " << products[0]->getName() << " and " << products[1]->getName() << endl;
-
-    cout << "\n===== Operator Overloading =====" << endl;
-    cout << *products[0] << endl;
-    if ((*products[0]) == (*products[1]))
-        cout << "Same product!" << endl;
-    else
-        cout << "Different products!" << endl;
-
-    // Free memory
-    for (int i = 0; i < 4; i++) {
-        delete products[i];
+    } catch (const exception& e) {
+        cout << "Critical Error: " << e.what() << endl;
     }
 
     return 0;
