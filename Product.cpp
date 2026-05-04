@@ -60,3 +60,31 @@ void Product::saveToFile(ofstream& file) {
 void Product::printTotalProducts() {
     cout << "Total products in store: " << totalProducts << endl;
 }
+
+Product* moreExpensive(Product* p1, Product* p2) {
+    cout << "Comparing: " << p1->name << " vs " << p2->name << endl;
+    if (p1->price > p2->price) {
+        cout << p1->name << " is more expensive." << endl;
+        return p1;
+    }
+    else {
+        cout << p2->name << " is more expensive." << endl;
+        return p2;
+    }
+}
+
+Product Product::operator+(const Product& other) {
+    Product result = *this;
+    result.quantity += other.quantity;
+    return result;
+}
+
+bool Product::operator==(const Product& other) {
+    return productID == other.productID;
+}
+
+ostream& operator<<(ostream& out, const Product& p) {
+    out << "ID: " << p.productID << " | Name: " << p.name
+        << " | Price: " << p.price << " | Quantity: " << p.quantity;
+    return out;
+}
