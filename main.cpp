@@ -10,7 +10,7 @@ int main() {
     // Create 4 products
     Product* products[4] = { nullptr, nullptr, nullptr, nullptr };
     try {
-    products[0] = new Book(101, "Clean Code", -250.0, 10, "Robert Martin", 431);
+    products[0] = new Book(101, "Clean Code", 250.0, 10, "Robert Martin", 431);
     }
 
     catch (InvalidPriceException& e) {
@@ -40,7 +40,7 @@ int main() {
         cout << e.what() << endl;
     }
     try {
-        products[3] = new Book(104, "Harry Potter", 180.0, 8, "J.K. Rowling", 500);
+        products[3] = new Book(104, "Harry Potter", -180.0, 8, "J.K. Rowling", 500);
     }
 
     catch (InvalidPriceException& e) {
