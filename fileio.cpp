@@ -6,9 +6,18 @@ void saveAllProducts(Product* products[], int size) {
         cout << "Error: Could not open file for saving!" << endl;
         return;
     }
-    file << size << "\n";
+    int validCount = 0;
     for (int i = 0; i < size; i++) {
-        products[i]->saveToFile(file);
+        if (products[i] != nullptr)
+            validCount++;
+    }
+
+    file << validCount << "\n";
+
+    for (int i = 0; i < size; i++) {
+        if (products[i] != nullptr) {  
+            products[i]->saveToFile(file);
+        }
     }
     file.close();
     cout << "Products saved to file successfully!" << endl;
