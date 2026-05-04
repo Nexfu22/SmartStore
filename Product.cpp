@@ -1,9 +1,13 @@
 #include "Product.h"
+#include "exceptions.h"
 
 // Initialize static variable
 int Product::totalProducts = 0;
 
 Product::Product(int id, string n, double p, int q) {
+
+    if (p < 0) throw InvalidPriceException(p);
+    if (q < 0) throw InvalidQuantityException(q);
     productID = id;
     name = n;
     price = p;
@@ -30,23 +34,26 @@ void Product::displayInfo() {
 
 void Product::buyOne() {
     if (quantity <= 0) {
-        cout << "Sorry, " << name << " is out of stock!" << endl;
-        return;
+        throw OutOfStockException(1, quantity);
     }
+
     quantity--;
     cout << "You bought 1 of [" << name << "]. Remaining: " << quantity << endl;
 }
 
 void Product::buyMultiple(int amount) {
     if (amount > quantity) {
-        cout << "Not enough stock! Available: " << quantity << endl;
-        return;
+        throw OutOfStockException(amount, quantity);
     }
+
     quantity -= amount;
     cout << "You bought " << amount << " of [" << name << "]. Remaining: " << quantity << endl;
 }
 
 void Product::saveToFile(ofstream& file) {
+    if (!file.is_open()) {
+        throw FileException("products.txt");
+    }
     file << productID << "\n" << name << "\n" << price << "\n" << quantity << "\n";
 }
 
