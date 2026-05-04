@@ -5,12 +5,11 @@
 #include "templates.h"
 #include "FileIO.h"
 
-
 int main() {
     // Create 4 products
     Product* products[4] = { nullptr, nullptr, nullptr, nullptr };
     try {
-    products[0] = new Book(101, "Clean Code", 250.0, 10, "Robert Martin", 431);
+        products[0] = new Book(101, "Clean Code", 250.0, 10, "Robert Martin", 431);
     }
 
     catch (InvalidPriceException& e) {
@@ -49,7 +48,7 @@ int main() {
     catch (InvalidQuantityException& e) {
         cout << e.what() << endl;
     }
-    
+
     // Display all products
     cout << "\n===== All Products =====" << endl;
     for (int i = 0; i < 4; i++) {
@@ -88,22 +87,35 @@ int main() {
         cout << e.what() << endl;
     }
 
+
+
     // File I/O
     cout << "\n===== File Operations =====" << endl;
     try {
-    saveAllProducts(products, 4);
-    readProductsFromFile();
+        saveAllProducts(products, 4);
+        readProductsFromFile();
     }
 
     catch (FileException& e) {
         cout << e.what() << endl;
     }
-    
+
+    moreExpensive(products[0], products[1]);
+
+
     Product* highest = findHighestPrice(products, 4);
     cout << "\nHighest price product: " << highest->getName() << endl;
 
+    cout << "Before swap: " << products[0]->getName() << " and " << products[1]->getName() << endl;
     swapProducts(products[0], products[1]);
-    cout << "After swap: " << products[0]->getName() << endl;
+    cout << "After swap: " << products[0]->getName() << " and " << products[1]->getName() << endl;
+
+    cout << "\n===== Operator Overloading =====" << endl;
+    cout << *products[0] << endl;
+    if ((*products[0]) == (*products[1]))
+        cout << "Same product!" << endl;
+    else
+        cout << "Different products!" << endl;
 
     // Free memory
     for (int i = 0; i < 4; i++) {
