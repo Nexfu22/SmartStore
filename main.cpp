@@ -2,6 +2,7 @@
 #include "ElectronicDevice.h"
 #include "OfficeSupply.h"
 #include "exceptions.h"
+#include "templates.h"
 #include "FileIO.h"
 
 
@@ -54,6 +55,12 @@ int main() {
         cout << e.what() << endl;
     }
     
+    Product* highest = findHighestPrice(products, 4);
+    cout << "\nHighest price product: " << highest->getName() << endl;
+
+    swapProducts(products[0], products[1]);
+    cout << "After swap: " << products[0]->getName() << endl;
+
     // Free memory
     for (int i = 0; i < 4; i++) {
         delete products[i];
