@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Smart_Store_Management_System.vcxproj" Id="83c77d25-3bdd-43da-b8d9-ddb371c78f30" />
+</Solution>
