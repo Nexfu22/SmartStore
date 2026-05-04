@@ -28,6 +28,12 @@ public:
     void buyMultiple(int amount);
     virtual void saveToFile(ofstream& file);
 
+    friend Product* moreExpensive(Product* p1, Product* p2);
+
+    Product operator+(const Product& other);
+    bool operator==(const Product& other);
+    friend ostream& operator<<(ostream& out, const Product& p);
+
     static void printTotalProducts();
 };
 
